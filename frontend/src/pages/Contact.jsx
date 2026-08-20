@@ -45,16 +45,89 @@ export default function Contact() {
         <div className="grid gap-10 lg:grid-cols-5">
           <div className="space-y-6 lg:col-span-2">
             <div className="card p-6">
-              <h2 className="font-display text-lg font-bold text-maroon-800">Mandal Address</h2>
-              <p className="mt-2 text-sm text-stone-600">
-                Ganesh Mandap, Shiv Mandir Road,<br />
-                Mumbai, Maharashtra 400001, India
-              </p>
-            </div>
-            <div className="card p-6">
-              <h2 className="font-display text-lg font-bold text-maroon-800">Email</h2>
-              <p className="mt-2 text-sm text-stone-600">mandal@example.com</p>
-            </div>
+  <h2 className="font-display text-lg font-bold text-maroon-800">
+    Mandal Address
+  </h2>
+
+  <p className="mt-2 text-sm text-stone-600">
+    Shri Krishna Nagar, Buti Bori,
+    <br />
+    Nagpur - Maharashtra, 441108, India
+  </p>
+
+  <a
+    href="https://www.google.com/maps/search/?api=1&query=Shri+Krishna+Nagar,+Buti+Bori,+Nagpur,+Maharashtra+441108,+India"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="mt-4 inline-flex items-center gap-2 rounded-lg bg-maroon-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-maroon-700"
+  >
+    📍 Open in Maps
+  </a>
+</div>
+         <div className="card p-6">
+  <h2 className="font-display text-lg font-bold text-maroon-800">
+    Connect Us
+  </h2>
+
+  <div className="mt-3 space-y-4 text-sm text-stone-600">
+    <div>
+      <h3 className="font-semibold text-stone-800">Mandal</h3>
+      <p>
+        ✉️{' '}
+        <a
+          href="mailto:shriganeshmitramandal24@gmail.com"
+          className="hover:text-orange-600 hover:underline"
+        >
+          shriganeshmitramandal24@gmail.com
+        </a>
+      </p>
+    </div>
+
+    <div>
+      <h3 className="font-semibold text-stone-800">Milind Bawane</h3>
+      <p>
+        📞{' '}
+        <a
+          href="tel:+918999502699"
+          className="hover:text-orange-600 hover:underline"
+        >
+          +91 89995 02699
+        </a>
+      </p>
+      <p>
+        ✉️{' '}
+        <a
+          href="mailto:milindbawane2002@gmail.com"
+          className="hover:text-orange-600 hover:underline"
+        >
+          milindbawane2002@gmail.com
+        </a>
+      </p>
+    </div>
+
+    <div>
+      <h3 className="font-semibold text-stone-800">Vishal Nerlekar</h3>
+      <p>
+        📞{' '}
+        <a
+          href="tel:+919403329478"
+          className="hover:text-orange-600 hover:underline"
+        >
+          +91 94033 29478
+        </a>
+      </p>
+      <p>
+        ✉️{' '}
+        <a
+          href="mailto:nerlekarvishal2002@gmail.com"
+          className="hover:text-orange-600 hover:underline"
+        >
+          nerlekarvishal2002@gmail.com
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
             <div className="card p-6">
               <h2 className="font-display text-lg font-bold text-maroon-800">Office Hours</h2>
               <p className="mt-2 text-sm text-stone-600">Daily 10:00 AM – 8:00 PM</p>
