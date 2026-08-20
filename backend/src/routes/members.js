@@ -4,24 +4,55 @@ import { requireAuth, requireAdmin } from '../middleware/auth.js';
 
 const router = Router();
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const PHONE_RE = /^[0-9+()\-\s]{7,20}$/;
+const MAX_ADDRESS_LENGTH = 250;
 
 // GET /api/members/me → own profile (any signed-in user)
 router.get('/me', requireAuth, async (req, res) => res.json(req.profile));
 
-// PUT /api/members/me → update own name / profile_image
+// PUT /api/members/me → update own profile fields
 router.put('/me', requireAuth, async (req, res, next) => {
   try {
-    const { name, profile_image } = req.body;
+    const { name, profile_image, phone, address } = req.body;
     const patch = {};
     if (typeof name === 'string' && name.trim()) patch.name = name.trim();
     if (typeof profile_image === 'string') patch.profile_image = profile_image || null;
+
+    if (typeof phone === 'string') {
+      const cleanedPhone = phone.trim();
+      if (!cleanedPhone) {
+        patch.phone = null;
+      } else {
+        if (!PHONE_RE.test(cleanedPhone)) {
+          return res.status(400).json({ error: 'Invalid phone number format' });
+        }
+        patch.phone = cleanedPhone;
+      }
+    } else if (phone === null) {
+      patch.phone = null;
+    }
+
+    if (typeof address === 'string') {
+      const cleanedAddress = address.trim();
+      if (!cleanedAddress) {
+        patch.address = null;
+      } else {
+        if (cleanedAddress.length > MAX_ADDRESS_LENGTH) {
+          return res.status(400).json({ error: `Address cannot exceed ${MAX_ADDRESS_LENGTH} characters` });
+        }
+        patch.address = cleanedAddress;
+      }
+    } else if (address === null) {
+      patch.address = null;
+    }
+
     if (Object.keys(patch).length === 0) return res.status(400).json({ error: 'Nothing to update' });
 
     const { data, error } = await supabaseAdmin
       .from('profiles')
       .update(patch)
       .eq('id', req.profile.id)
-      .select('id, name, email, role, profile_image, created_at')
+      .select('id, name, email, role, profile_image, phone, address, created_at')
       .single();
     if (error) return res.status(400).json({ error: error.message });
     return res.json(data);
@@ -35,7 +66,7 @@ router.get('/', requireAdmin, async (_req, res, next) => {
   try {
     const { data, error } = await supabaseAdmin
       .from('profiles')
-      .select('id, name, email, role, profile_image, created_at')
+      .select('id, name, email, role, profile_image, phone, address, created_at')
       .order('created_at', { ascending: false })
       .limit(500);
     if (error) return res.status(400).json({ error: error.message });
@@ -64,7 +95,7 @@ router.put('/:id', requireAdmin, async (req, res, next) => {
       .from('profiles')
       .update(patch)
       .eq('id', req.params.id)
-      .select('id, name, email, role, profile_image, created_at')
+      .select('id, name, email, role, profile_image, phone, address, created_at')
       .single();
     if (error) return res.status(400).json({ error: error.message });
     if (!data) return res.status(404).json({ error: 'Member not found' });
