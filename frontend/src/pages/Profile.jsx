@@ -10,6 +10,8 @@ import Spinner from '../components/Spinner.jsx';
 export default function Profile() {
   const { user, profile, loading, isAdmin, signOut, refreshProfile } = useAuth();
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [profileImage, setProfileImage] = useState(profile?.profile_image || '');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -29,6 +31,8 @@ export default function Profile() {
   }
 
   const currentName = name || profile.name;
+  const currentPhone = phone || profile.phone || '';
+  const currentAddress = address || profile.address || '';
   const currentImage = profileImage || profile.profile_image || '';
 
   async function handleSave(e) {
@@ -39,10 +43,14 @@ export default function Profile() {
     try {
       await api.updateMe({
         name: currentName,
+        phone: currentPhone,
+        address: currentAddress,
         profile_image: currentImage,
       });
       await refreshProfile();
       setName('');
+      setPhone('');
+      setAddress('');
       setProfileImage(profile?.profile_image || '');
       setMessage('Profile updated successfully 🙏');
     } catch (err) {
@@ -85,6 +93,27 @@ export default function Profile() {
             <div>
               <label className="label">Email (from account)</label>
               <input className="input bg-stone-100 text-stone-500" value={profile.email} disabled />
+            </div>
+            <div>
+              <label className="label">Phone Number</label>
+              <input
+                className="input"
+                value={currentPhone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Your phone number"
+                type="tel"
+                autoComplete="tel"
+              />
+            </div>
+            <div>
+              <label className="label">Address</label>
+              <input
+                className="input"
+                value={currentAddress}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Your address"
+                autoComplete="street-address"
+              />
             </div>
             <div>
               <label className="label">Member since</label>

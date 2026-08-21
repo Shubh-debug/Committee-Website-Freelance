@@ -36,13 +36,11 @@ export default function Navbar() {
         {/* Brand */}
         <Link to="/" className="flex items-center gap-3">
           <div className="relative h-11 w-11 overflow-hidden rounded-full ring-2 ring-gold-500/70 shadow-sm">
-            <ImagePlaceholder
-              src={''}
-              caption="श्री गणेश"
-              variant="gold"
-              className="h-11 w-11 object-cover"
-              alt="Mandal logo"
-            />
+            <img
+  src="/images/ganesha.png"
+  alt="श्री गणेश मित्र मंडळ"
+  className="h-11 w-11 object-contain"
+ />
           </div>
           <div className="leading-tight">
             <p className="font-display text-sm font-bold tracking-tight text-maroon-800 sm:text-base">

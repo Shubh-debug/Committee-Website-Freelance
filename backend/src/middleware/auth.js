@@ -14,7 +14,7 @@ export async function requireAuth(req, res, next) {
 
   const { data: profile, error: profileError } = await supabaseAdmin
     .from('profiles')
-    .select('id, name, email, role, profile_image, created_at')
+    .select('id, name, email, role, profile_image, phone, address, created_at')
     .eq('id', data.user.id)
     .maybeSingle();
 

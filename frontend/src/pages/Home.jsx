@@ -66,7 +66,7 @@ export default function Home() {
             </p>
             <h1 className="anim-fade-up delay-100 font-display text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
               <span className="text-gradient-gold">श्री गणेश मित्र मंडळ</span>
-              <span className="mt-2 block text-3xl text-cream-100 sm:text-4xl lg:text-5xl">2026</span>
+              <span className="mt-2 block text-3xl text-cream-100 sm:text-4xl lg:text-5xl">स्थापना २०२४</span>
             </h1>
             <p className="anim-fade-up delay-200 mt-4 text-2xl font-semibold text-saffron-300 sm:text-3xl">
               गणपती बाप्पा मोरया!
@@ -92,13 +92,11 @@ export default function Home() {
           <div className="relative w-full max-w-md flex-1">
             <div className="anim-spin-slow absolute -inset-6 rounded-full border-2 border-dashed border-gold-500/40" />
             <div className="relative overflow-hidden rounded-[2rem] shadow-2xl ring-4 ring-gold-500/50">
-              <ImagePlaceholder
-                src=""
-                caption="गणपती बाप्पा मोरया"
-                variant="gold"
-                className="aspect-[4/5] w-full object-cover"
-                alt="Lord Ganesha idol — placeholder"
-              />
+              <img
+  src="/images/ganesha.png"
+  alt="श्री गणेश मित्र मंडळ - गणपती बाप्पा"
+  className="mx-auto w-[85%] object-contain"
+/>
             </div>
             <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-gold-500 px-6 py-2 text-sm font-bold text-maroon-800 shadow-lg">
               शुभ गणेश चतुर्थी

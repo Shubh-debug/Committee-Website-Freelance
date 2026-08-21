@@ -56,11 +56,13 @@ export default function AdminMembers() {
   function MemberTable({ rows }) {
     return (
       <div className="overflow-x-auto rounded-2xl border border-stone-200 bg-white shadow-sm">
-        <table className="w-full min-w-[620px] text-left text-sm">
+        <table className="w-full min-w-[860px] text-left text-sm">
           <thead className="bg-maroon-800 text-cream-100">
             <tr>
               <th className="px-4 py-3">Member</th>
               <th className="px-4 py-3">Role</th>
+              <th className="px-4 py-3">Number</th>
+              <th className="px-4 py-3">Address</th>
               <th className="px-4 py-3">Joined</th>
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
@@ -94,6 +96,10 @@ export default function AdminMembers() {
                 </td>
                 <td className="px-4 py-3">
                   {m.role === 'admin' ? <span className="badge-admin">Admin</span> : <span className="badge-published">Member</span>}
+                </td>
+                <td className="px-4 py-3 text-stone-600">{m.phone || '—'}</td>
+                <td className="px-4 py-3 text-stone-600">
+                  <span className="block max-w-[26ch] truncate" title={m.address || '—'}>{m.address || '—'}</span>
                 </td>
                 <td className="px-4 py-3 text-stone-500">{formatDate(m.created_at)}</td>
                 <td className="px-4 py-3">
