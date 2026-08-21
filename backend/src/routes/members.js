@@ -4,7 +4,7 @@ import { requireAuth, requireAdmin } from '../middleware/auth.js';
 
 const router = Router();
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const PHONE_RE = /^[0-9+()\-\s]{7,20}$/;
+const PHONE_RE = /^[6-9][0-9]{9}$/;
 const MAX_ADDRESS_LENGTH = 250;
 
 // GET /api/members/me → own profile (any signed-in user)
@@ -19,12 +19,12 @@ router.put('/me', requireAuth, async (req, res, next) => {
     if (typeof profile_image === 'string') patch.profile_image = profile_image || null;
 
     if (typeof phone === 'string') {
-      const cleanedPhone = phone.trim();
+      const cleanedPhone = phone.trim().replace(/\s+/g, '');
       if (!cleanedPhone) {
         patch.phone = null;
       } else {
         if (!PHONE_RE.test(cleanedPhone)) {
-          return res.status(400).json({ error: 'Invalid phone number format' });
+          return res.status(400).json({ error: 'Phone number must be exactly 10 digits and start with 6, 7, 8, or 9' });
         }
         patch.phone = cleanedPhone;
       }

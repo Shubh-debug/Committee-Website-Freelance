@@ -4,24 +4,25 @@ import { formatDate, uploadErrorToMessage } from '../../lib/utils.js';
 import ImagePlaceholder from '../../components/ImagePlaceholder.jsx';
 import ImageUpload from '../../components/ImageUpload.jsx';
 import Spinner from '../../components/Spinner.jsx';
+import { useToast } from '../../components/Toast.jsx';
+import { useConfirm } from '../../components/ConfirmModal.jsx';
 
 export default function AdminGallery() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [saving, setSaving] = useState(false);
-  const [notice, setNotice] = useState('');
+  const { showToast } = useToast();
+  const confirm = useConfirm();
 
   const load = async () => {
     setLoading(true);
     try {
       setItems(await api.listGallery());
-      setError('');
     } catch (e) {
-      setError(e.message);
+      showToast(e.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -33,31 +34,29 @@ export default function AdminGallery() {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    if (!imageUrl) return setError('Please upload or provide an image first.');
+    if (!imageUrl) return showToast('Please upload or provide an image first.', 'error');
     setSaving(true);
-    setError('');
     try {
       await api.createGalleryItem({ title: title.trim(), description: description.trim(), image_url: imageUrl });
-      setNotice('Photo added to gallery 🙏');
+      showToast('Photo added to gallery successfully.', 'success');
       setTitle('');
       setDescription('');
       setImageUrl('');
       await load();
     } catch (err) {
-      setError(uploadErrorToMessage(err));
+      showToast(uploadErrorToMessage(err), 'error');
     } finally {
       setSaving(false);
     }
   };
 
   const remove = async (item) => {
-    if (!window.confirm(`Remove this photo from the gallery?`)) return;
-    try {
-      await api.deleteGalleryItem(item.id);
-      await load();
-    } catch (err) {
-      alert(err.message);
-    }
+    await confirm({
+      title: 'Delete Gallery Photo',
+      message: 'Remove this photo from the gallery? This action cannot be undone.',
+      onConfirm: async () => { await api.deleteGalleryItem(item.id); showToast('Photo deleted successfully.', 'success'); await load(); },
+      onError: (err) => showToast(err.message, 'error'),
+    });
   };
 
   return (
@@ -66,8 +65,6 @@ export default function AdminGallery() {
         <h1 className="font-display text-3xl font-bold text-maroon-800">Gallery</h1>
         <p className="mt-1 text-stone-500">Upload festival photos. Files go to Supabase Storage.</p>
       </div>
-
-      {notice && <p className="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">{notice}</p>}
 
       <form onSubmit={handleAdd} className="card mb-8 space-y-5 p-6">
         <h2 className="font-display text-lg font-bold text-maroon-800">📸 Add Photo</h2>
@@ -84,7 +81,6 @@ export default function AdminGallery() {
           </div>
           <div className="space-y-5">
             <ImageUpload label="Photo *" caption="Gallery photo" value={imageUrl} onChange={setImageUrl} />
-            {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{error}</p>}
             <button type="submit" disabled={saving} className="btn-primary w-full disabled:opacity-60">
               {saving ? 'Saving…' : 'Add to Gallery'}
             </button>
@@ -94,8 +90,6 @@ export default function AdminGallery() {
 
       {loading ? (
         <Spinner />
-      ) : error ? (
-        <div className="card p-6 text-red-600">{error}</div>
       ) : items.length === 0 ? (
         <div className="card p-12 text-center text-stone-500">No photos yet. Add the first one above.</div>
       ) : (

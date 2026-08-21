@@ -10,6 +10,7 @@ import eventsRouter from './routes/events.js';
 import announcementsRouter from './routes/announcements.js';
 import galleryRouter from './routes/gallery.js';
 import membersRouter from './routes/members.js';
+import financeRouter from './routes/finance.js';
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/events', eventsRouter);
 app.use('/api/announcements', announcementsRouter);
 app.use('/api/gallery', galleryRouter);
 app.use('/api/members', membersRouter);
+app.use('/api/finance', financeRouter);
 
 // 404 handler
 app.use((_req, res) => res.status(404).json({ error: 'Route not found' }));

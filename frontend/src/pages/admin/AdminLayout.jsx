@@ -1,5 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { ConfirmProvider } from '../../components/ConfirmModal.jsx';
 
 const LINKS = [
   { to: '/admin', label: 'Dashboard', end: true },
@@ -8,16 +9,19 @@ const LINKS = [
   { to: '/admin/announcements', label: 'Announcements' },
   { to: '/admin/gallery', label: 'Gallery' },
   { to: '/admin/members', label: 'Members' },
+  { to: '/admin/funds', label: 'Funds' },
+  { to: '/admin/expenses', label: 'Expenses' },
 ];
 
 export default function AdminLayout() {
   const { profile } = useAuth();
 
   return (
-    <div className="min-h-screen bg-stone-100">
+    <ConfirmProvider>
+      <div className="min-h-screen bg-stone-100">
       <div className="flex flex-col lg:flex-row">
         {/* Sidebar */}
-        <aside className="mandala-overlay-light flex flex-col bg-maroon-800 text-cream-100 lg:min-h-screen lg:w-72 lg:shrink-0">
+        <aside className="mandala-overlay-light flex flex-col bg-maroon-800 text-cream-100 lg:min-h-screen lg:w-62 lg:shrink-0">
           <div className="border-b border-cream-100/10 px-5 py-5">
             <p className="font-display text-lg font-bold text-gradient-gold">Admin Dashboard</p>
             <p className="mt-1 truncate text-xs text-cream-200/70">{profile?.email || 'Admin account'}</p>
@@ -50,6 +54,7 @@ export default function AdminLayout() {
           <Outlet />
         </main>
       </div>
-    </div>
+      </div>
+    </ConfirmProvider>
   );
 }

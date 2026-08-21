@@ -3,6 +3,7 @@ import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute.jsx';
+import { ToastProvider } from './components/Toast.jsx';
 
 import Home from './pages/Home.jsx';
 import About from './pages/About.jsx';
@@ -23,6 +24,8 @@ import AdminEvents from './pages/admin/AdminEvents.jsx';
 import AdminAnnouncements from './pages/admin/AdminAnnouncements.jsx';
 import AdminGallery from './pages/admin/AdminGallery.jsx';
 import AdminMembers from './pages/admin/AdminMembers.jsx';
+import AdminFunds from './pages/admin/AdminFunds.jsx';
+import AdminExpenses from './pages/admin/AdminExpenses.jsx';
 
 function NotFound() {
   return (
@@ -37,7 +40,8 @@ function NotFound() {
 
 export default function App() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <ToastProvider>
+      <div className="flex min-h-screen flex-col">
       <ScrollToTop />
       <Navbar />
       <main className="flex-1">
@@ -76,12 +80,15 @@ export default function App() {
             <Route path="announcements" element={<AdminAnnouncements />} />
             <Route path="gallery" element={<AdminGallery />} />
             <Route path="members" element={<AdminMembers />} />
+            <Route path="funds" element={<AdminFunds />} />
+            <Route path="expenses" element={<AdminExpenses />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />
-    </div>
+      </div>
+    </ToastProvider>
   );
 }

@@ -23,6 +23,31 @@ export function formatDateTime(iso) {
   });
 }
 
+export function formatCurrency(value) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return '—';
+  return Number(value).toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 });
+}
+
+export function todayInputValue() {
+  const today = new Date();
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+}
+
+export function currentYearStartValue() {
+  return `${new Date().getFullYear()}-01-01`;
+}
+
+export function formatIndianPhone(phone) {
+  if (!phone) return '—';
+  const digits = normalizeIndianPhone(phone);
+  return /^[6-9]\d{9}$/.test(digits) ? `+91 ${digits}` : phone;
+}
+
+export function normalizeIndianPhone(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  return digits.length === 12 && digits.startsWith('91') ? digits.slice(2) : digits;
+}
+
 export function initials(name = '') {
   return name
     .trim()

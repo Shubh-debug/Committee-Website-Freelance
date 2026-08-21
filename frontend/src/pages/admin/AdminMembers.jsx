@@ -1,23 +1,24 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../lib/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { formatDate, initials, storageUrl, uploadErrorToMessage } from '../../lib/utils.js';
+import { formatDate, formatIndianPhone, initials, storageUrl } from '../../lib/utils.js';
 import Spinner from '../../components/Spinner.jsx';
+import { useToast } from '../../components/Toast.jsx';
+import { useConfirm } from '../../components/ConfirmModal.jsx';
 
 export default function AdminMembers() {
   const { profile: me } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
+  const { showToast } = useToast();
+  const confirm = useConfirm();
 
   const load = async () => {
     setLoading(true);
     try {
       setItems(await api.adminMembers());
-      setError('');
     } catch (e) {
-      setError(e.message);
+      showToast(e.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -28,26 +29,30 @@ export default function AdminMembers() {
   }, []);
 
   const changeRole = async (member, role) => {
-    if (!window.confirm(`Set role of ${member.email} to "${role}"?`)) return;
-    try {
-      await api.updateMember(member.id, { role });
-      setNotice(`Role updated for ${member.email} 🙏`);
-      await load();
-    } catch (err) {
-      alert(err.message);
-    }
+    await confirm({
+      title: 'Change Member Role',
+      message: `Set the role of ${member.email} to "${role}"?`,
+      onConfirm: async () => {
+        await api.updateMember(member.id, { role });
+        showToast(`Role updated for ${member.email}.`, 'success');
+        await load();
+      },
+      onError: (err) => showToast(err.message, 'error'),
+    });
   };
 
   const remove = async (member) => {
-    if (member.id === me?.id) return alert('You cannot delete your own account.');
-    if (!window.confirm(`Delete member ${member.email}? Their content will also be removed.`)) return;
-    try {
-      await api.deleteMember(member.id);
-      setNotice(`Member ${member.email} deleted.`);
-      await load();
-    } catch (err) {
-      alert(uploadErrorToMessage(err));
-    }
+    if (member.id === me?.id) return showToast('You cannot delete your own account.', 'error');
+    await confirm({
+      title: 'Delete Member',
+      message: `Delete member ${member.email}? Their content will also be removed.`,
+      onConfirm: async () => {
+        await api.deleteMember(member.id);
+        showToast(`Member ${member.email} deleted.`, 'success');
+        await load();
+      },
+      onError: (err) => showToast(err.message, 'error'),
+    });
   };
 
   const members = items.filter((m) => m.role === 'member');
@@ -61,7 +66,7 @@ export default function AdminMembers() {
             <tr>
               <th className="px-4 py-3">Member</th>
               <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Number</th>
+              <th className="px-4 py-3">Phone Number</th>
               <th className="px-4 py-3">Address</th>
               <th className="px-4 py-3">Joined</th>
               <th className="px-4 py-3 text-right">Actions</th>
@@ -97,7 +102,7 @@ export default function AdminMembers() {
                 <td className="px-4 py-3">
                   {m.role === 'admin' ? <span className="badge-admin">Admin</span> : <span className="badge-published">Member</span>}
                 </td>
-                <td className="px-4 py-3 text-stone-600">{m.phone || '—'}</td>
+                <td className="px-4 py-3 text-stone-600">{formatIndianPhone(m.phone)}</td>
                 <td className="px-4 py-3 text-stone-600">
                   <span className="block max-w-[26ch] truncate" title={m.address || '—'}>{m.address || '—'}</span>
                 </td>
@@ -136,9 +141,6 @@ export default function AdminMembers() {
         <h1 className="font-display text-3xl font-bold text-maroon-800">Members</h1>
         <p className="mt-1 text-stone-500">Manage roles and remove members.</p>
       </div>
-
-      {notice && <p className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">{notice}</p>}
-      {error && <div className="card mb-6 border-red-200 bg-red-50 p-6 text-red-600">{error}</div>}
 
       {loading ? (
         <Spinner full />
