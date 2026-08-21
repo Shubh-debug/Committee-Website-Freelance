@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 import { supabase } from '../lib/supabase.js';
-import { storageUrl } from '../lib/utils.js';
 import ImagePlaceholder from './ImagePlaceholder.jsx';
 
 /**
@@ -51,9 +50,9 @@ export default function ImageUpload({ value, onChange, caption = 'गणपत�
         <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading} className="btn-outline !px-4 !py-2 text-sm disabled:opacity-60">
           {uploading ? 'Uploading…' : '📤 Upload Image'}
         </button>
-        <button type="button" onClick={() => setUrlMode((v) => !v)} className="btn-outline !px-4 !py-2 text-sm">
+        {/* <button type="button" onClick={() => setUrlMode((v) => !v)} className="btn-outline !px-4 !py-2 text-sm">
           🔗 Use URL
-        </button>
+        </button> */}
         {value && (
           <button type="button" onClick={() => onChange('')} className="rounded-full px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50">
             ✕ Remove
@@ -62,29 +61,24 @@ export default function ImageUpload({ value, onChange, caption = 'गणपत�
       </div>
       <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
 
-      {urlMode && (
+      {/* {urlMode && (
         <input
           className="input"
           placeholder="https://… (external image URL)"
           value={value && !value.startsWith('images/') && value.startsWith('http') ? value : ''}
           onChange={(e) => onChange(e.target.value)}
         />
-      )}
+      )} */}
 
       {error && <p className="text-sm font-medium text-red-600">{error}</p>}
 
-      <div className="h-36 w-full overflow-hidden rounded-xl ring-1 ring-black/10">
+      <div className="mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-2xl bg-stone-100 ring-1 ring-black/10">
         <ImagePlaceholder
           src={value}
           caption={caption}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain"
         />
       </div>
-      {value && (
-        <p className="truncate text-xs text-stone-400">
-          {value.startsWith('images/') ? `📁 ${storageUrl(value)}` : value}
-        </p>
-      )}
     </div>
   );
 }

@@ -3,6 +3,8 @@ import { api } from '../../lib/api.js';
 import { formatDate, uploadErrorToMessage } from '../../lib/utils.js';
 import ImageUpload from '../../components/ImageUpload.jsx';
 import Spinner from '../../components/Spinner.jsx';
+import { useToast } from '../../components/Toast.jsx';
+import { useConfirm } from '../../components/ConfirmModal.jsx';
 
 const EMPTY = { title: '', excerpt: '', content: '', cover_image: '', published: false };
 
@@ -10,19 +12,18 @@ export default function AdminPosts() {
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
-  const [notice, setNotice] = useState('');
+  const { showToast } = useToast();
+  const confirm = useConfirm();
 
   const load = async (q = '') => {
     setLoading(true);
     try {
       setItems(await api.adminPosts(q));
-      setError('');
     } catch (e) {
-      setError(e.message);
+      showToast(e.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -46,22 +47,19 @@ export default function AdminPosts() {
       cover_image: item.cover_image || '',
       published: Boolean(item.published),
     });
-    setNotice('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const startNew = () => {
     setEditingId(null);
     setForm(EMPTY);
-    setNotice('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title.trim()) return setError('Title is required.');
+    if (!form.title.trim()) return showToast('Title is required.', 'error');
     setSaving(true);
-    setError('');
     try {
       const payload = {
         title: form.title.trim(),
@@ -72,12 +70,12 @@ export default function AdminPosts() {
       };
       if (editingId) await api.updatePost(editingId, payload);
       else await api.createPost(payload);
-      setNotice(editingId ? 'Post updated 🙏' : 'Post created 🙏');
+      showToast(editingId ? 'Post updated successfully.' : 'Post created successfully.', 'success');
       setEditingId(null);
       setForm(EMPTY);
       await load(search);
     } catch (err) {
-      setError(uploadErrorToMessage(err));
+      showToast(uploadErrorToMessage(err), 'error');
     } finally {
       setSaving(false);
     }
@@ -88,18 +86,17 @@ export default function AdminPosts() {
       await api.updatePost(item.id, { published: !item.published });
       await load(search);
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
   const remove = async (item) => {
-    if (!window.confirm(`Delete post "${item.title}"? This cannot be undone.`)) return;
-    try {
-      await api.deletePost(item.id);
-      await load(search);
-    } catch (err) {
-      alert(err.message);
-    }
+    await confirm({
+      title: 'Delete Post',
+      message: `Delete post "${item.title}"? This action cannot be undone.`,
+      onConfirm: async () => { await api.deletePost(item.id); showToast('Post deleted successfully.', 'success'); await load(search); },
+      onError: (err) => showToast(err.message, 'error'),
+    });
   };
 
   return (
@@ -113,8 +110,6 @@ export default function AdminPosts() {
           + New Post
         </button>
       </div>
-
-      {notice && <p className="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">{notice}</p>}
 
       {/* Editor */}
       <form onSubmit={handleSubmit} className="card mb-8 space-y-5 p-6">
@@ -149,7 +144,6 @@ export default function AdminPosts() {
               <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="h-5 w-5 accent-saffron-600" />
               <span className="text-sm font-medium text-stone-700">Publish immediately</span>
             </label>
-            {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{error}</p>}
             <button type="submit" disabled={saving} className="btn-primary w-full disabled:opacity-60">
               {saving ? 'Saving…' : editingId ? 'Update Post' : 'Create Post'}
             </button>
@@ -163,8 +157,6 @@ export default function AdminPosts() {
       </div>
       {loading ? (
         <Spinner />
-      ) : error ? (
-        <div className="card p-6 text-red-600">{error}</div>
       ) : items.length === 0 ? (
         <div className="card p-12 text-center text-stone-500">No posts found.</div>
       ) : (

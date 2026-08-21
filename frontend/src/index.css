@@ -174,10 +174,20 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-8px) translateX(8px); }
+  to { opacity: 1; transform: translateY(0) translateX(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0) translateX(0); }
+  to { opacity: 0; transform: translateY(-8px) translateX(8px); }
+}
 
 .anim-fade-up { animation: fadeUp 0.7s ease both; }
 .anim-float { animation: floaty 6s ease-in-out infinite; }
 .anim-spin-slow { animation: spinSlow 40s linear infinite; }
+.anim-toast { animation: toastIn 0.22s ease-out both; }
+.anim-toast-out { animation: toastOut 0.18s ease-in both; }
 .anim-shimmer {
   background: linear-gradient(90deg, #f3ead3 0%, #fbf5e4 40%, #f3ead3 80%);
   background-size: 600px 100%;

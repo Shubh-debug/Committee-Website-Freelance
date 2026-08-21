@@ -3,25 +3,26 @@ import { api } from '../../lib/api.js';
 import { formatDate, uploadErrorToMessage } from '../../lib/utils.js';
 import ImageUpload from '../../components/ImageUpload.jsx';
 import Spinner from '../../components/Spinner.jsx';
+import { useToast } from '../../components/Toast.jsx';
+import { useConfirm } from '../../components/ConfirmModal.jsx';
 
 const EMPTY = { title: '', content: '', image: '', published: false };
 
 export default function AdminAnnouncements() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
-  const [notice, setNotice] = useState('');
+  const { showToast } = useToast();
+  const confirm = useConfirm();
 
   const load = async () => {
     setLoading(true);
     try {
       setItems(await api.adminAnnouncements());
-      setError('');
     } catch (e) {
-      setError(e.message);
+      showToast(e.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -34,32 +35,29 @@ export default function AdminAnnouncements() {
   const startEdit = (item) => {
     setEditingId(item.id);
     setForm({ title: item.title || '', content: item.content || '', image: item.image || '', published: Boolean(item.published) });
-    setNotice('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const startNew = () => {
     setEditingId(null);
     setForm(EMPTY);
-    setNotice('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title.trim()) return setError('Title is required.');
+    if (!form.title.trim()) return showToast('Title is required.', 'error');
     setSaving(true);
-    setError('');
     try {
       const payload = { title: form.title.trim(), content: form.content, image: form.image || null, published: Boolean(form.published) };
       if (editingId) await api.updateAnnouncement(editingId, payload);
       else await api.createAnnouncement(payload);
-      setNotice(editingId ? 'Announcement updated 🙏' : 'Announcement created 🙏');
+      showToast(editingId ? 'Announcement updated successfully.' : 'Announcement created successfully.', 'success');
       setEditingId(null);
       setForm(EMPTY);
       await load();
     } catch (err) {
-      setError(uploadErrorToMessage(err));
+      showToast(uploadErrorToMessage(err), 'error');
     } finally {
       setSaving(false);
     }
@@ -70,18 +68,17 @@ export default function AdminAnnouncements() {
       await api.updateAnnouncement(item.id, { published: !item.published });
       await load();
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
   const remove = async (item) => {
-    if (!window.confirm(`Delete announcement "${item.title}"?`)) return;
-    try {
-      await api.deleteAnnouncement(item.id);
-      await load();
-    } catch (err) {
-      alert(err.message);
-    }
+    await confirm({
+      title: 'Delete Announcement',
+      message: `Delete announcement "${item.title}"? This action cannot be undone.`,
+      onConfirm: async () => { await api.deleteAnnouncement(item.id); showToast('Announcement deleted successfully.', 'success'); await load(); },
+      onError: (err) => showToast(err.message, 'error'),
+    });
   };
 
   return (
@@ -93,8 +90,6 @@ export default function AdminAnnouncements() {
         </div>
         <button onClick={startNew} className="btn-primary !px-5 !py-2 text-sm">+ New Announcement</button>
       </div>
-
-      {notice && <p className="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">{notice}</p>}
 
       <form onSubmit={handleSubmit} className="card mb-8 space-y-5 p-6">
         <h2 className="font-display text-lg font-bold text-maroon-800">{editingId ? '✏️ Edit Announcement' : '📣 New Announcement'}</h2>
@@ -115,7 +110,6 @@ export default function AdminAnnouncements() {
               <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="h-5 w-5 accent-saffron-600" />
               <span className="text-sm font-medium text-stone-700">Publish immediately</span>
             </label>
-            {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{error}</p>}
             <button type="submit" disabled={saving} className="btn-primary w-full disabled:opacity-60">
               {saving ? 'Saving…' : editingId ? 'Update Announcement' : 'Create Announcement'}
             </button>
@@ -125,8 +119,6 @@ export default function AdminAnnouncements() {
 
       {loading ? (
         <Spinner />
-      ) : error ? (
-        <div className="card p-6 text-red-600">{error}</div>
       ) : items.length === 0 ? (
         <div className="card p-12 text-center text-stone-500">No announcements yet.</div>
       ) : (

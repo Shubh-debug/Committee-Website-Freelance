@@ -65,4 +65,17 @@ export const api = {
 
   // ---- dashboard ----
   dashboardStats: () => get('/dashboard/stats'),
+
+  // ---- finance ----
+  financeOverview: (year) => get(`/finance/overview?year=${year}`),
+  financeSettings: () => get('/finance/settings'),
+  updateFinanceSettings: (data) => put('/finance/settings', data),
+  contributions: (year) => get(`/finance/contributions?year=${year}`),
+  createContribution: (data) => post('/finance/contributions', data),
+  updateContribution: (id, data) => put(`/finance/contributions/${id}`, data),
+  deleteContribution: (id) => del(`/finance/contributions/${id}`),
+  expenses: (year) => get(`/finance/expenses?year=${year}`),
+  createExpense: (data) => post('/finance/expenses', data),
+  updateExpense: (id, data) => put(`/finance/expenses/${id}`, data),
+  deleteExpense: (id) => del(`/finance/expenses/${id}`),
 };

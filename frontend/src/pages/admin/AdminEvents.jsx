@@ -3,25 +3,26 @@ import { api } from '../../lib/api.js';
 import { formatDate, uploadErrorToMessage } from '../../lib/utils.js';
 import ImageUpload from '../../components/ImageUpload.jsx';
 import Spinner from '../../components/Spinner.jsx';
+import { useToast } from '../../components/Toast.jsx';
+import { useConfirm } from '../../components/ConfirmModal.jsx';
 
 const EMPTY = { title: '', description: '', event_date: '', event_time: '', location: '', image: '' };
 
 export default function AdminEvents() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
-  const [notice, setNotice] = useState('');
+  const { showToast } = useToast();
+  const confirm = useConfirm();
 
   const load = async () => {
     setLoading(true);
     try {
       setItems(await api.listEvents());
-      setError('');
     } catch (e) {
-      setError(e.message);
+      showToast(e.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -41,23 +42,20 @@ export default function AdminEvents() {
       location: item.location || '',
       image: item.image || '',
     });
-    setNotice('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const startNew = () => {
     setEditingId(null);
     setForm(EMPTY);
-    setNotice('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title.trim()) return setError('Title is required.');
-    if (!form.event_date) return setError('Date is required.');
+    if (!form.title.trim()) return showToast('Title is required.', 'error');
+    if (!form.event_date) return showToast('Date is required.', 'error');
     setSaving(true);
-    setError('');
     try {
       const payload = {
         title: form.title.trim(),
@@ -69,25 +67,24 @@ export default function AdminEvents() {
       };
       if (editingId) await api.updateEvent(editingId, payload);
       else await api.createEvent(payload);
-      setNotice(editingId ? 'Event updated 🙏' : 'Event created 🙏');
+      showToast(editingId ? 'Event updated successfully.' : 'Event created successfully.', 'success');
       setEditingId(null);
       setForm(EMPTY);
       await load();
     } catch (err) {
-      setError(uploadErrorToMessage(err));
+      showToast(uploadErrorToMessage(err), 'error');
     } finally {
       setSaving(false);
     }
   };
 
   const remove = async (item) => {
-    if (!window.confirm(`Delete event "${item.title}"?`)) return;
-    try {
-      await api.deleteEvent(item.id);
-      await load();
-    } catch (err) {
-      alert(err.message);
-    }
+    await confirm({
+      title: 'Delete Event',
+      message: `Delete event "${item.title}"? This action cannot be undone.`,
+      onConfirm: async () => { await api.deleteEvent(item.id); showToast('Event deleted successfully.', 'success'); await load(); },
+      onError: (err) => showToast(err.message, 'error'),
+    });
   };
 
   return (
@@ -99,8 +96,6 @@ export default function AdminEvents() {
         </div>
         <button onClick={startNew} className="btn-primary !px-5 !py-2 text-sm">+ New Event</button>
       </div>
-
-      {notice && <p className="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">{notice}</p>}
 
       <form onSubmit={handleSubmit} className="card mb-8 space-y-5 p-6">
         <h2 className="font-display text-lg font-bold text-maroon-800">{editingId ? '✏️ Edit Event' : '🗓️ New Event'}</h2>
@@ -129,7 +124,6 @@ export default function AdminEvents() {
             <ImageUpload label="Event Image" caption={form.title || 'Event'} value={form.image} onChange={(v) => setForm({ ...form, image: v })} />
           </div>
         </div>
-        {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{error}</p>}
         <button type="submit" disabled={saving} className="btn-primary disabled:opacity-60">
           {saving ? 'Saving…' : editingId ? 'Update Event' : 'Create Event'}
         </button>
@@ -137,8 +131,6 @@ export default function AdminEvents() {
 
       {loading ? (
         <Spinner />
-      ) : error ? (
-        <div className="card p-6 text-red-600">{error}</div>
       ) : items.length === 0 ? (
         <div className="card p-12 text-center text-stone-500">No events yet. Create your first event above.</div>
       ) : (
