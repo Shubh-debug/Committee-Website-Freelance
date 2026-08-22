@@ -68,6 +68,12 @@ ganesh-mandal-2026/
    This creates all tables, RLS policies, triggers, the storage bucket and its policies.
 3. (Optional but recommended) **Authentication → Providers → Email**: enable
    "Confirm email" if you want email verification, or disable it for instant logins.
+4. In **Authentication → URL Configuration**, add these redirect URLs:
+   - `http://localhost:5173/update-password`
+   - `https://<your-production-domain>/update-password`
+
+   Set the production site URL to your deployed frontend origin. Replace the
+   placeholder production domain with the actual domain used by the frontend.
 
 ### 2. Configure the environment
 
@@ -114,6 +120,20 @@ Open http://localhost:5173 → register a normal member to test the member exper
 then sign in with the admin credentials to try `/admin`.
 
 ---
+
+## 🔐 Password management
+
+Members and admins can change their password from **Profile → System Actions →
+Change Password**. The current password is verified by Supabase Auth using a
+fresh `signInWithPassword` request, then the authenticated client calls
+`updateUser({ password })`; passwords never go to the Express API or any app
+table.
+
+The **Forgot Password?** link on Login calls Supabase Auth's
+`resetPasswordForEmail()` with the `/update-password` redirect. The update page
+requires the recovery session supplied by Supabase before changing the
+password. This project intentionally uses Supabase's built-in email service;
+SMTP and external email providers are not required or configured.
 
 ## 🧪 What to test
 

@@ -6,6 +6,7 @@ import { formatDate, initials, normalizeIndianPhone, storageUrl } from '../lib/u
 import ImageUpload from '../components/ImageUpload.jsx';
 import Spinner from '../components/Spinner.jsx';
 import { useToast } from '../components/Toast.jsx';
+import ChangePasswordModal from '../components/ChangePasswordModal.jsx';
 
 export default function Profile() {
   const { user, profile, loading, isAdmin, signOut, refreshProfile } = useAuth();
@@ -14,6 +15,7 @@ export default function Profile() {
   const [address, setAddress] = useState('');
   const [profileImage, setProfileImage] = useState(profile?.profile_image || '');
   const [saving, setSaving] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const { showToast } = useToast();
 
   if (loading) return <Spinner full label="Loading profile…" />;
@@ -202,6 +204,14 @@ export default function Profile() {
                     Admin Dashboard
                   </Link>
                 )}
+                <button
+                  type="button"
+                  onClick={() => setChangePasswordOpen(true)}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-maroon-800 px-4 py-2.5 text-sm font-bold text-cream-100 transition hover:bg-maroon-700"
+                >
+                  <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
+                  Change Password
+                </button>
                 <button 
                   type="button" 
                   onClick={signOut} 
@@ -215,6 +225,7 @@ export default function Profile() {
           </form>
         </div>
       </div>
+      {changePasswordOpen && <ChangePasswordModal onClose={() => setChangePasswordOpen(false)} />}
     </div>
   );
 }
