@@ -22,6 +22,17 @@ async function request(path, options = {}) {
   return body;
 }
 
+async function download(path) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers = session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+  const res = await fetch(`${BASE}${path}`, { headers });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Request failed (${res.status})`);
+  }
+  return res.blob();
+}
+
 const get = (path) => request(path);
 const post = (path, data) => request(path, { method: 'POST', body: JSON.stringify(data) });
 const put = (path, data) => request(path, { method: 'PUT', body: JSON.stringify(data) });
@@ -78,4 +89,5 @@ export const api = {
   createExpense: (data) => post('/finance/expenses', data),
   updateExpense: (id, data) => put(`/finance/expenses/${id}`, data),
   deleteExpense: (id) => del(`/finance/expenses/${id}`),
+  exportFinance: (kind, year, format) => download(`/finance/export/${kind}?year=${year}&format=${format}`),
 };

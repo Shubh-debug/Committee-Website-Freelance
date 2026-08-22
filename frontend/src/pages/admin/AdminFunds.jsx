@@ -4,6 +4,7 @@ import { currentYearStartValue, formatCurrency, formatDate, todayInputValue } fr
 import Spinner from '../../components/Spinner.jsx';
 import { useToast } from '../../components/Toast.jsx';
 import { useConfirm } from '../../components/ConfirmModal.jsx';
+import ExportMenu from '../../components/ExportMenu.jsx';
 
 const FUNDS_YEARS = Array.from({ length: 11 }, (_, index) => 2025 + index);
 const currentYear = new Date().getFullYear();
@@ -115,9 +116,9 @@ export default function AdminFunds() {
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div><h1 className="font-display text-3xl font-bold text-maroon-800">Funds</h1><p className="mt-1 text-stone-500">Manage contributions and yearly opening balances.</p></div>
-        <label className="flex items-center gap-2 text-sm font-semibold text-stone-600">Year
+        <div className="flex flex-wrap items-center gap-2"><label className="flex items-center gap-2 text-sm font-semibold text-stone-600">Year
           <select className="input !w-auto" value={year} onChange={(event) => { reset(); setYear(Number(event.target.value)); }}>{FUNDS_YEARS.map((option) => <option key={option}>{option}</option>)}</select>
-        </label>
+        </label><ExportMenu kind="funds" year={year} showToast={showToast} /></div>
       </div>
       {loading ? <Spinner full /> : (
         <>

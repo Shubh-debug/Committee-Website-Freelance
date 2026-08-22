@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import ImagePlaceholder from '../components/ImagePlaceholder.jsx';
 import Section from '../components/Section.jsx';
 
 const VALUES = [
@@ -10,7 +9,7 @@ const VALUES = [
 ];
 
 const STATS = [
-  { value: '2026', label: 'Celebration Year' },
+  { value: '2024', label: 'Establishment Year' },
   { value: '500+', label: 'Community Members' },
   { value: '15+', label: 'Programs per Season' },
   { value: '10+', label: 'Years of Devotion' },
@@ -19,28 +18,49 @@ const STATS = [
 export default function About() {
   return (
     <div>
+      {/* ------------------------------------------------------------ HERO */}
       <section className="mandala-overlay bg-maroon-800 bg-gradient-to-br from-maroon-700 to-maroon-900 py-20 text-center text-cream-100">
         <div className="mx-auto max-w-3xl px-6">
-          <p className="text-sm font-semibold uppercase tracking-widest text-gold-300">About Us</p>
-          <h1 className="mt-3 font-display text-4xl font-extrabold text-gradient-gold sm:text-5xl">
-            श्री गणेश मित्र मंडळ 2026
-          </h1>
-          <p className="mt-4 text-lg text-cream-100/95">गणपती बाप्पा मोरया! मंगलमूर्ती मोरया!</p>
+          
+          <p className="text-sm font-semibold uppercase tracking-widest text-gold-300">
+            About Us
+          </p>
+          
+          <div className="mt-3 flex flex-col items-center justify-center gap-1 sm:gap-2">
+            <h1 className="font-display text-4xl font-extrabold text-gradient-gold sm:text-5xl">
+              श्री गणेश मित्र मंडळ
+            </h1>
+            <span className="inline-block rounded-full border border-gold-500/30 bg-gold-500/10 px-4 py-1 text-base font-bold tracking-wide text-gold-200 shadow-sm backdrop-blur-sm sm:text-lg">
+              स्थापना २०२४
+            </span>
+          </div>
+
+          <p className="mt-6 text-xl font-medium tracking-wide text-cream-100/95 sm:text-2xl">
+            गणपती बाप्पा मोरया! मंगलमूर्ती मोरया!
+          </p>
         </div>
       </section>
 
+      {/* ------------------------------------------------------------ OUR STORY */}
       <section className="mx-auto max-w-7xl px-6 py-20">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          <div className="relative">
-            <div className="absolute -left-6 -top-6 h-40 w-40 rounded-full border-2 border-dashed border-gold-500/50" />
-            <ImagePlaceholder
-              src=""
-              caption="आमचा मित्र मंडळ"
-              variant="default"
-              className="aspect-[4/3] w-full rounded-3xl object-cover shadow-2xl ring-4 ring-gold-500/40"
-              alt="Mandal group photo placeholder"
-            />
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          
+          {/* Logo replacing the rectangular placeholder */}
+          <div className="relative flex items-center justify-center p-4 sm:p-8 lg:p-0">
+            {/* Soft, warm ambient glow tailored for a light background */}
+            <div className="absolute top-1/2 left-1/2 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full bg-gold-400/20 blur-[50px]" />
+            
+            {/* The Logo with a maroon-tinted drop shadow for depth */}
+            <div className="relative z-10 w-full max-w-md drop-shadow-[0_20px_35px_rgba(131,24,67,0.15)] transition-transform duration-700 hover:scale-105">
+              <img
+                src="/images/ganesha.png"
+                alt="श्री गणेश मित्र मंडळ - गणपती बाप्पा"
+                className="mx-auto w-[85%] object-contain sm:w-[95%]"
+              />
+            </div>
           </div>
+
+          {/* Text Content */}
           <div>
             <Section align="left" eyebrow="Our Story" title="A Legacy of Togetherness" />
             <div className="-mt-4 space-y-4 text-stone-600">
@@ -70,6 +90,7 @@ export default function About() {
         </div>
       </section>
 
+      {/* ------------------------------------------------------------ VALUES */}
       <section className="bg-gradient-to-b from-gold-100 to-cream-100 py-20">
         <div className="mx-auto max-w-7xl px-6">
           <Section
@@ -79,7 +100,7 @@ export default function About() {
           />
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {VALUES.map((v) => (
-              <div key={v.title} className="card p-6 text-center">
+              <div key={v.title} className="card p-6 text-center transition-shadow hover:shadow-lg">
                 <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-saffron-100 text-3xl ring-2 ring-gold-500/40">
                   {v.icon}
                 </span>
@@ -91,6 +112,7 @@ export default function About() {
         </div>
       </section>
 
+      {/* ------------------------------------------------------------ STATS */}
       <section className="mx-auto max-w-7xl px-6 py-20">
         <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
           {STATS.map((s) => (

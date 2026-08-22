@@ -46,7 +46,7 @@ export default function Navbar() {
             <p className="font-display text-sm font-bold tracking-tight text-maroon-800 sm:text-base">
               श्री गणेश मित्र मंडळ
             </p>
-            <p className="text-[10px] font-semibold text-gold-600 sm:text-xs">2026 · गणपती बाप्पा मोरया 🙏</p>
+            <p className="text-[10px] font-semibold text-gold-600 sm:text-xs">स्थापना २०२४</p>
           </div>
         </Link>
 

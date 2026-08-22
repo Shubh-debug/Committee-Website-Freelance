@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api.js';
-import { placeholder } from '../lib/placeholder.js';
 import { formatDate, eventDayLabel, timeAgo } from '../lib/utils.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import ImagePlaceholder from '../components/ImagePlaceholder.jsx';
@@ -62,7 +61,7 @@ export default function Home() {
         <div className="relative mx-auto flex max-w-7xl flex-col items-center gap-10 px-6 py-24 text-center lg:flex-row lg:py-28 lg:text-left">
           <div className="flex-1">
             <p className="anim-fade-up mb-4 inline-flex items-center gap-2 rounded-full bg-cream-100/10 px-4 py-1.5 text-sm font-medium text-gold-200 ring-1 ring-gold-500/40">
-              आमचा गणेशोत्सव · 2026
+              आमचा गणेशोत्सव
             </p>
             <h1 className="anim-fade-up delay-100 font-display text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
               <span className="text-gradient-gold">श्री गणेश मित्र मंडळ</span>
@@ -88,24 +87,26 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Hero image / Ganesha idol placeholder */}
-          <div className="relative w-full max-w-md flex-1">
-            <div className="anim-spin-slow absolute -inset-6 rounded-full border-2 border-dashed border-gold-500/40" />
-            <div className="relative overflow-hidden rounded-[2rem] shadow-2xl ring-4 ring-gold-500/50">
+          <div className="relative mt-8 flex w-full max-w-lg flex-1 items-center justify-center lg:mt-0 lg:justify-end">
+            <div className="absolute top-1/2 left-1/2 h-[75%] w-[75%] -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full bg-gold-500/25 blur-[60px]" />
+            
+            <div className="relative z-10 w-full drop-shadow-[0_0_30px_rgba(253,224,71,0.25)] transition-transform duration-700 hover:scale-105">
               <img
-  src="/images/ganesha.png"
-  alt="श्री गणेश मित्र मंडळ - गणपती बाप्पा"
-  className="mx-auto w-[85%] object-contain"
-/>
-            </div>
-            <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-gold-500 px-6 py-2 text-sm font-bold text-maroon-800 shadow-lg">
-              शुभ गणेश चतुर्थी
+                src="/images/ganesha.png"
+                alt="श्री गणेश मित्र मंडळ - गणपती बाप्पा"
+                className="mx-auto w-[90%] object-contain sm:w-[95%]"
+              />
+              
+              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-gold-200/40 bg-gradient-to-r from-gold-500 to-gold-400 px-8 py-2.5 text-sm font-extrabold tracking-widest text-maroon-900 shadow-xl shadow-gold-500/40">
+                शुभ गणेश चतुर्थी
+              </div>
             </div>
           </div>
+
         </div>
 
         <div className="relative border-t border-cream-100/10 bg-deep/40 py-3 text-center text-sm tracking-wide text-gold-200/80">
-          धूमधडाक्यात साजरा करूया उत्सव — सप्टेंबर 2026
+          धूमधडाक्यात साजरा करूया उत्सव — गणपती बाप्पा मोरया
         </div>
       </section>
 
@@ -124,11 +125,12 @@ export default function Home() {
             <p className="text-stone-500">Events will appear here as the admin publishes them.</p>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="flex flex-wrap justify-center gap-6">
             {upcoming.map((ev) => (
-              <Link key={ev.id} to="/events" className="card group overflow-hidden">
+              <Link key={ev.id} to="/events" className="card group flex-1 min-w-[280px] max-w-[380px] overflow-hidden">
                 <ImagePlaceholder
                   src={ev.image}
+                  variant="event"
                   caption={ev.title}
                   className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -166,9 +168,9 @@ export default function Home() {
               <p className="mt-3 text-cream-100/90">No announcements yet.</p>
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="flex flex-wrap justify-center gap-6">
               {announcements.map((a) => (
-                <Link key={a.id} to="/announcements" className="group rounded-2xl bg-cream-100/5 p-6 ring-1 ring-cream-100/10 transition hover:bg-cream-100/10">
+                <Link key={a.id} to="/announcements" className="group flex-1 min-w-[280px] max-w-[380px] rounded-2xl bg-black/20 backdrop-blur-md p-6 ring-1 ring-white/10 shadow-xl transition-all hover:-translate-y-1 hover:bg-black/30 hover:ring-white/20 hover:shadow-2xl">
                   <p className="text-xs font-semibold uppercase tracking-wider text-gold-300">
                     {timeAgo(a.created_at)}
                   </p>
@@ -200,11 +202,12 @@ export default function Home() {
             <p className="mt-3 text-stone-500">No posts published yet.</p>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="flex flex-wrap justify-center gap-6">
             {posts.map((p) => (
-              <Link key={p.id} to={`/posts/${p.id}`} className="card group overflow-hidden">
+              <Link key={p.id} to={`/posts/${p.id}`} className="card group flex-1 min-w-[280px] max-w-[380px] overflow-hidden">
                 <ImagePlaceholder
                   src={p.cover_image}
+                  variant="image"
                   caption={p.title}
                   className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -225,25 +228,27 @@ export default function Home() {
       </section>
 
       {/* --------------------------------------------------- GALLERY PREVIEW */}
-      <section className="bg-gradient-to-b from-gold-100 to-cream-100 py-20">
-        <div className="mx-auto max-w-7xl px-6">
+      <section className="mandala-overlay relative bg-maroon-900 bg-gradient-to-b from-maroon-900 to-black py-20 text-cream-100">
+        <div className="relative mx-auto max-w-7xl px-6">
           <Section
             eyebrow="Gallery"
             title="Gallery Highlights"
             subtitle="फोटो गॅलरी — उत्सवाचे क्षण"
+            theme="light" 
           />
           {loading ? (
             <Spinner />
           ) : gallery.length === 0 ? (
-            <div className="empty-state max-w-xl">
-              <p className="mt-3 text-stone-500">Photos will appear here soon.</p>
+            <div className="empty-state max-w-xl border-cream-100/10">
+              <p className="mt-3 text-cream-100/60">Photos will appear here soon.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
               {gallery.map((g) => (
-                <Link key={g.id} to="/gallery" className="group overflow-hidden rounded-2xl shadow-md ring-1 ring-black/5">
+                <Link key={g.id} to="/gallery" className="group flex-1 min-w-[150px] max-w-[280px] sm:min-w-[220px] overflow-hidden rounded-2xl shadow-xl ring-1 ring-cream-100/20">
                   <ImagePlaceholder
                     src={g.image_url}
+                    variant="image"
                     caption={g.title || 'Gallery photo'}
                     className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
@@ -255,8 +260,8 @@ export default function Home() {
       </section>
 
       {/* --------------------------------------------------- CTA */}
-      <section className="mandala-overlay mx-auto max-w-5xl px-6 py-20">
-        <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-saffron-500 to-maroon-700 p-10 text-center text-white shadow-2xl sm:p-14">
+      <section className="mx-auto max-w-5xl px-6 py-20">
+        <div className="relative overflow-hidden rounded-[2rem] border border-gold-500/30 bg-gradient-to-br from-maroon-800 to-stone-900 p-10 text-center text-white shadow-2xl sm:p-14">
           <h2 className="font-display text-3xl font-extrabold sm:text-4xl">
             Join the Mandal Family
           </h2>
@@ -267,7 +272,7 @@ export default function Home() {
             <Link to={user ? '/profile' : '/register'} className="rounded-full bg-white px-8 py-3 font-semibold text-maroon-700 shadow-lg transition hover:-translate-y-0.5">
               {user ? 'My Profile' : 'Join Now - Free'}
             </Link>
-            <Link to="/contact" className="rounded-full border-2 border-white/70 px-8 py-3 font-semibold text-white transition hover:bg-white/10">
+            <Link to="/contact" className="rounded-full border-2 border-white/40 px-8 py-3 font-semibold text-white transition hover:bg-white/10 hover:border-white/70">
               Contact Us
             </Link>
           </div>

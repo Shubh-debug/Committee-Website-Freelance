@@ -7,11 +7,10 @@ import ImagePlaceholder from './ImagePlaceholder.jsx';
  * and returns the public URL via onChange. Also accepts an external URL.
  * Requires a signed-in user (storage insert policy allows authenticated).
  */
-export default function ImageUpload({ value, onChange, caption = 'गणपती बाप्पा मोरया', label = 'Image' }) {
+export default function ImageUpload({ value, onChange, caption = 'No Image', label = 'Image' }) {
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
-  const [urlMode, setUrlMode] = useState(false);
 
   async function handleFile(e) {
     const file = e.target.files?.[0];
@@ -50,9 +49,6 @@ export default function ImageUpload({ value, onChange, caption = 'गणपत�
         <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading} className="btn-outline !px-4 !py-2 text-sm disabled:opacity-60">
           {uploading ? 'Uploading…' : '📤 Upload Image'}
         </button>
-        {/* <button type="button" onClick={() => setUrlMode((v) => !v)} className="btn-outline !px-4 !py-2 text-sm">
-          🔗 Use URL
-        </button> */}
         {value && (
           <button type="button" onClick={() => onChange('')} className="rounded-full px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50">
             ✕ Remove
@@ -60,15 +56,6 @@ export default function ImageUpload({ value, onChange, caption = 'गणपत�
         )}
       </div>
       <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-
-      {/* {urlMode && (
-        <input
-          className="input"
-          placeholder="https://… (external image URL)"
-          value={value && !value.startsWith('images/') && value.startsWith('http') ? value : ''}
-          onChange={(e) => onChange(e.target.value)}
-        />
-      )} */}
 
       {error && <p className="text-sm font-medium text-red-600">{error}</p>}
 

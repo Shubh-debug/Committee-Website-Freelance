@@ -4,6 +4,7 @@ import { currentYearStartValue, formatCurrency, formatDate, todayInputValue } fr
 import Spinner from '../../components/Spinner.jsx';
 import { useToast } from '../../components/Toast.jsx';
 import { useConfirm } from '../../components/ConfirmModal.jsx';
+import ExportMenu from '../../components/ExportMenu.jsx';
 
 const EXPENSE_YEARS = Array.from({ length: 10 }, (_, index) => 2026 + index);
 const currentYear = new Date().getFullYear();
@@ -89,7 +90,7 @@ export default function AdminExpenses() {
   };
 
   return <div>
-    <div className="mb-6 flex flex-wrap items-center justify-between gap-3"><div><h1 className="font-display text-3xl font-bold text-maroon-800">Expenses</h1><p className="mt-1 text-stone-500">Track spending and calculated running balances.</p></div><label className="flex items-center gap-2 text-sm font-semibold text-stone-600">Year<select className="input !w-auto" value={year} onChange={(event) => { setEditingId(null); setForm(EMPTY); setYear(Number(event.target.value)); }}>{EXPENSE_YEARS.map((option) => <option key={option}>{option}</option>)}</select></label></div>
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-3"><div><h1 className="font-display text-3xl font-bold text-maroon-800">Expenses</h1><p className="mt-1 text-stone-500">Track spending and calculated running balances.</p></div><div className="flex flex-wrap items-center gap-2"><label className="flex items-center gap-2 text-sm font-semibold text-stone-600">Year<select className="input !w-auto" value={year} onChange={(event) => { setEditingId(null); setForm(EMPTY); setYear(Number(event.target.value)); }}>{EXPENSE_YEARS.map((option) => <option key={option}>{option}</option>)}</select></label><ExportMenu kind="expenses" year={year} showToast={showToast} /></div></div>
     {loading ? <Spinner full /> : !overview?.initialized ? <div className="empty-state"><h2 className="font-display text-xl font-bold text-maroon-800">Financial system needs initialization</h2><p className="mt-2 text-sm text-stone-500">Set the 2025 closing balance on the Funds page before recording expenses.</p></div> : <>
       {year !== currentYear && <p className="mb-6 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm font-medium text-sky-800">{year} is view-only. Expenses can be added after that year begins.</p>}
       <div className="mb-6 grid gap-4 sm:grid-cols-3"><Summary label="Total Funds" value={overview.totalFunds} /><Summary label="Total Expenses" value={overview.totalExpenses} /><Summary label="Current Balance" value={overview.currentBalance} /></div>

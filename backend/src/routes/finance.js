@@ -11,6 +11,7 @@ import {
   validateId,
   validateYear,
 } from '../services/finance.js';
+import { expensesCsv, financialPdf, fundsCsv, loadExportData } from '../services/financeExport.js';
 
 const router = Router();
 const CONTRIBUTION_FIELDS = 'id,contribution_date,name,amount,type,created_at,updated_at';
@@ -57,6 +58,27 @@ router.get('/settings', requireAdmin, async (_req, res, next) => {
     if (error) return next(error);
     return res.json(data);
   } catch (error) {
+    return next(error);
+  }
+});
+
+router.get('/export/:kind', requireAdmin, async (req, res, next) => {
+  try {
+    if (!['funds', 'expenses'].includes(req.params.kind)) return res.status(404).json({ error: 'Export type not found' });
+    const year = validateYear(req.query.year);
+    if (year < 2025 || year > 2035) throw new Error('Invalid financial year');
+    const format = String(req.query.format || '').toLowerCase();
+    if (!['csv', 'pdf'].includes(format)) return res.status(400).json({ error: 'Export format must be csv or pdf' });
+    const data = await loadExportData(supabaseAdmin, year);
+    const filename = `Ganesh_Mitra_Mandal_${req.params.kind[0].toUpperCase()}${req.params.kind.slice(1)}_${year}.${format}`;
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    if (format === 'csv') {
+      res.type('text/csv; charset=utf-8').send(req.params.kind === 'funds' ? fundsCsv(data) : expensesCsv(data));
+    } else {
+      res.type('application/pdf').send(await financialPdf({ ...data, kind: req.params.kind }));
+    }
+  } catch (error) {
+    if (error.message.startsWith('Invalid financial year')) return fail(res, error);
     return next(error);
   }
 });
