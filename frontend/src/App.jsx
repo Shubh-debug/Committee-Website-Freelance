@@ -2,7 +2,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
-import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute.jsx';
+import { ProtectedRoute, AdminRoute, GuestRoute } from './components/ProtectedRoute.jsx';
 import { ToastProvider } from './components/Toast.jsx';
 
 import Home from './pages/Home.jsx';
@@ -16,6 +16,8 @@ import Contact from './pages/Contact.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Profile from './pages/Profile.jsx';
+import ForgotPassword from './pages/ForgotPassword.jsx';
+import UpdatePassword from './pages/UpdatePassword.jsx';
 
 import AdminLayout from './pages/admin/AdminLayout.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
@@ -54,8 +56,12 @@ export default function App() {
           <Route path="/posts/:id" element={<PostDetails />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route element={<GuestRoute />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
           <Route
             path="/profile"
             element={

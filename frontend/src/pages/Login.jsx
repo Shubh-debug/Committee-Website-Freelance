@@ -78,8 +78,9 @@ export default function Login() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-stone-600">Email <span className="text-red-500">*</span></label>
+                <label htmlFor="login-email" className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-stone-600">Email <span className="text-red-500">*</span></label>
                 <input
+                  id="login-email"
                   type="email"
                   required
                   value={email}
@@ -90,9 +91,10 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-stone-600">Password <span className="text-red-500">*</span></label>
+                <label htmlFor="login-password" className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-stone-600">Password <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <input
+                    id="login-password"
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
@@ -103,6 +105,7 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 focus:outline-none"
                   >
                     {showPassword ? (
@@ -111,6 +114,11 @@ export default function Login() {
                       <EyeIcon className="h-5 w-5" />
                     )}
                   </button>
+                </div>
+                <div className="mt-2 text-right">
+                  <Link to="/forgot-password" className="text-sm font-semibold text-orange-600 transition-colors hover:text-orange-700 hover:underline">
+                    Forgot Password?
+                  </Link>
                 </div>
               </div>
 

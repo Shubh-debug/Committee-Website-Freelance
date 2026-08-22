@@ -8,6 +8,8 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null); // Supabase auth user
   const [profile, setProfile] = useState(null); // profiles row (name, role…)
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [recoverySession, setRecoverySession] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -17,10 +19,12 @@ export function AuthProvider({ children }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      if (event === 'PASSWORD_RECOVERY') setRecoverySession(true);
       if (!session?.user) {
         setProfile(null);
+        setRecoverySession(false);
         setLoading(false);
       }
     });
@@ -34,8 +38,10 @@ export function AuthProvider({ children }) {
     } = await supabase.auth.getSession();
     if (!session) {
       setProfile(null);
+      setProfileLoading(false);
       return null;
     }
+    setProfileLoading(true);
     try {
       const p = await api.me();
       setProfile(p);
@@ -43,6 +49,8 @@ export function AuthProvider({ children }) {
     } catch {
       setProfile(null);
       return null;
+    } finally {
+      setProfileLoading(false);
     }
   }, []);
 
@@ -78,6 +86,18 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    setRecoverySession(false);
+  };
+
+  const changePassword = async (currentPassword, newPassword) => {
+    if (!user?.email) throw new Error('Your session is missing an email address. Please sign in again.');
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+    if (verifyError) throw new Error('Current password is incorrect.');
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
   };
 
   const value = {
@@ -89,6 +109,9 @@ export function AuthProvider({ children }) {
     signUp,
     signIn,
     signOut,
+    changePassword,
+    recoverySession,
+    profileLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
