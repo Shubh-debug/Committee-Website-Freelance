@@ -164,6 +164,23 @@ function writeTable(doc, headers, rows, widths, aligns) {
   });
 }
 
+// Resolve the letterhead logo across local dev and the bundled Netlify function.
+// Netlify bundles this ESM source to CJS, which leaves import.meta.url empty,
+// so the path is derived from known deploy roots instead.
+function resolveLogoPath() {
+  const candidates = [
+    '/var/task/src/Assets/Logo.png',
+    '/var/task/backend/src/Assets/Logo.png',
+    path.resolve(process.cwd(), 'src/Assets/Logo.png'),
+    path.resolve(process.cwd(), 'backend/src/Assets/Logo.png'),
+    typeof __dirname !== 'undefined' ? path.resolve(__dirname, '../../src/Assets/Logo.png') : null,
+  ].filter(Boolean);
+
+  const found = candidates.find((candidate) => fs.existsSync(candidate));
+  if (!found) console.warn('[financeExport] Logo.png not found. Checked:', candidates);
+  return found || null;
+}
+
 export function financialPdf({ kind, overview, contributions, expenses }) {
   const doc = new PDFDocument({ size: 'A4', margin: 48, bufferPages: true });
   const chunks = [];
@@ -171,8 +188,8 @@ export function financialPdf({ kind, overview, contributions, expenses }) {
   const done = new Promise((resolve, reject) => { doc.on('end', () => resolve(Buffer.concat(chunks))); doc.on('error', reject); });
 
   /* --- 1. LETTERHEAD WITH LOGO --- */
-  const logoPath = path.resolve('./src/Assets/Logo.png');
-  const hasLogo = fs.existsSync(logoPath);
+  const logoPath = resolveLogoPath();
+  const hasLogo = Boolean(logoPath);
   
   if (hasLogo) {
     // Increased logo size from 55 to 75

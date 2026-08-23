@@ -92,6 +92,31 @@ cp backend/.env.example backend/.env
 > ⚠️ The **service-role key is secret** — it only ever lives in `backend/.env`.
 > Never put it in frontend code or commit it to Git (`.gitignore` already excludes `.env`).
 
+### Netlify deployment
+
+This repository can deploy the Vite frontend and the existing Express app through
+Netlify. `netlify.toml` builds both workspaces, routes `/api/*` to the
+`backend/netlify/functions/api.js` adapter, and sends other paths to the React
+SPA entry point. The function imports the same Express app and routes used by
+local development; it does not duplicate business logic.
+
+Configure these Netlify environment variables for the function:
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD` (only needed for the admin-provisioning script)
+- `FRONTEND_URL` set to the deployed Netlify site URL
+
+Configure these Netlify environment variables for the frontend build:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+Leave `VITE_API_BASE` unset for same-origin `/api` calls. For Supabase Auth,
+add `https://<your-netlify-site>/update-password` and your local
+`http://localhost:5173/update-password` under Authentication → URL Configuration.
+
 ### 3. Create the admin account
 
 ```bash
@@ -153,30 +178,24 @@ SMTP and external email providers are not required or configured.
 
 ---
 
-## ☁️ Deployment
+## ☁️ Deployment on Netlify
 
-### Frontend → Vercel
+1. Connect this repository to Netlify. The root `netlify.toml` builds both the
+   frontend and backend dependencies, publishes `frontend/dist`, routes `/api/*`
+   to the Express function, and preserves React Router deep links.
+2. Add frontend build variables: `VITE_SUPABASE_URL` and
+   `VITE_SUPABASE_ANON_KEY`. Leave `VITE_API_BASE` unset so production uses
+   same-origin `/api` requests.
+3. Add function variables: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
+   `ADMIN_EMAIL`, and `FRONTEND_URL` set to the deployed Netlify site URL.
+   `PORT` is only needed for local Express development. `ADMIN_PASSWORD` is
+   only needed when running `npm run create:admin` manually.
+4. Run `npm run create:admin` locally against the same Supabase project once if
+   the admin account has not yet been provisioned.
 
-1. Push the repo to GitHub, import `frontend/` as a Vercel project
-   (Root directory: `frontend`).
-2. Add env vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`,
-   and `VITE_API_BASE=https://<your-backend>.onrender.com`.
-3. Build command `npm run build`, output `dist`. Deploy.
-
-### Backend → Render (or Railway/Fly.io)
-
-1. Create a new **Web Service** pointing at the repo, Root directory `backend`,
-   build `npm install`, start `npm start`.
-2. Add env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_EMAIL`,
-   `ADMIN_PASSWORD`, `PORT=5000`.
-3. Run `npm run create:admin` **once** (Render → Shell, or locally against the
-   same Supabase project) to provision the admin.
-4. If Vite's proxy is not used in production, the frontend calls
-   `VITE_API_BASE` directly (already supported in `src/lib/api.js`).
-
-**CORS note:** the API enables `cors()` for all origins by default — for
-production you should restrict it, e.g. `app.use(cors({ origin: 'https://your-app.vercel.app' }))`
-in `backend/src/server.js`.
+The Netlify function imports the same `backend/src/app.js` used by local
+development. Supabase remains the database, authentication provider, and image
+storage service.
 
 ### Supabase
 
