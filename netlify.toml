@@ -4,8 +4,11 @@
   functions = "backend/netlify/functions"
 
 [functions]
-  external_node_modules = ["express"]
+  external_node_modules = ["express", "pdfkit"]
   node_bundler = "esbuild"
+
+[functions.api]
+  included_files = ["backend/node_modules/pdfkit/js/data/**"]
 
 [[redirects]]
   from = "/api/*"
