@@ -8,7 +8,10 @@
   node_bundler = "esbuild"
 
 [functions.api]
-  included_files = ["backend/node_modules/pdfkit/js/data/**"]
+  included_files = [
+    "backend/node_modules/pdfkit/js/data/**",
+    "backend/src/Assets/Logo.png"
+  ]
 
 [[redirects]]
   from = "/api/*"

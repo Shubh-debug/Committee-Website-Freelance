@@ -172,8 +172,15 @@ export function financialPdf({ kind, overview, contributions, expenses }) {
   const done = new Promise((resolve, reject) => { doc.on('end', () => resolve(Buffer.concat(chunks))); doc.on('error', reject); });
 
   /* --- 1. LETTERHEAD WITH LOGO --- */
-  const logoPath = fileURLToPath(new URL('../Assets/Logo.png', import.meta.url));
-  const hasLogo = fs.existsSync(logoPath);
+  const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
+  const logoCandidates = [
+    path.resolve(moduleDirectory, '../Assets/Logo.png'),
+    path.resolve(moduleDirectory, '../../src/Assets/Logo.png'),
+    path.resolve(moduleDirectory, 'src/Assets/Logo.png'),
+    path.resolve(process.cwd(), 'backend/src/Assets/Logo.png'),
+  ];
+  const logoPath = logoCandidates.find((candidate) => fs.existsSync(candidate));
+  const hasLogo = Boolean(logoPath);
   
   if (hasLogo) {
     // Increased logo size from 55 to 75
