@@ -1,6 +1,7 @@
 import PDFDocument from 'pdfkit';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { addRunningBalances, calculateOverview, sorted } from './finance.js';
 
 const CONTRIBUTION_FIELDS = 'contribution_date,name,amount,type,created_at,id';
@@ -171,7 +172,7 @@ export function financialPdf({ kind, overview, contributions, expenses }) {
   const done = new Promise((resolve, reject) => { doc.on('end', () => resolve(Buffer.concat(chunks))); doc.on('error', reject); });
 
   /* --- 1. LETTERHEAD WITH LOGO --- */
-  const logoPath = path.resolve('./src/Assets/Logo.png');
+  const logoPath = fileURLToPath(new URL('../Assets/Logo.png', import.meta.url));
   const hasLogo = fs.existsSync(logoPath);
   
   if (hasLogo) {
