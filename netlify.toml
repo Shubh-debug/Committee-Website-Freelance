@@ -3,6 +3,10 @@
   publish = "frontend/dist"
   functions = "backend/netlify/functions"
 
+[functions]
+  external_node_modules = ["express"]
+  node_bundler = "esbuild"
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
