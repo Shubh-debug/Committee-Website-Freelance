@@ -2,13 +2,27 @@ import express from 'express';
 import cors from 'cors';
 
 import { isSupabaseConfigured } from './config/supabase.js';
-import dashboardRouter from './routes/dashboard.js';
-import postsRouter from './routes/posts.js';
-import eventsRouter from './routes/events.js';
-import announcementsRouter from './routes/announcements.js';
-import galleryRouter from './routes/gallery.js';
-import membersRouter from './routes/members.js';
-import financeRouter from './routes/finance.js';
+import * as dashboardModule from './routes/dashboard.js';
+import * as postsModule from './routes/posts.js';
+import * as eventsModule from './routes/events.js';
+import * as announcementsModule from './routes/announcements.js';
+import * as galleryModule from './routes/gallery.js';
+import * as membersModule from './routes/members.js';
+import * as financeModule from './routes/finance.js';
+
+function unwrapRouter(module) {
+  let router = module;
+  while (router && typeof router !== 'function' && router.default) router = router.default;
+  return router;
+}
+
+const dashboardRouter = unwrapRouter(dashboardModule);
+const postsRouter = unwrapRouter(postsModule);
+const eventsRouter = unwrapRouter(eventsModule);
+const announcementsRouter = unwrapRouter(announcementsModule);
+const galleryRouter = unwrapRouter(galleryModule);
+const membersRouter = unwrapRouter(membersModule);
+const financeRouter = unwrapRouter(financeModule);
 
 const app = express();
 const allowedOrigins = (process.env.FRONTEND_URL || process.env.URL || '')
